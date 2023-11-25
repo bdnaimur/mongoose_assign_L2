@@ -48,6 +48,11 @@ const userSchema = new Schema<TUser>(
   }
 );
 
+
+userSchema.set('versionKey', false);
+orderSchema.set('versionKey', false);
+
+
 userSchema.pre("save", async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;

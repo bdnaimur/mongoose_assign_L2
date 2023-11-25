@@ -1,5 +1,5 @@
-import { TUser } from "./user.interface";
-import { UserModel } from "./user.model";
+import { TOrder, TUser } from "./user.interface";
+import { OrderModel, UserModel } from "./user.model";
 
 const createUserIntoDB = async (userData: TUser) => {
     if (await UserModel.isUserExists(userData.userId)) {
@@ -20,6 +20,12 @@ const getAllOrdersFromDB = async (userId: string | number) => {
   const result = await UserModel.findOne({ userId },'orders');
   return result;
 };
+
+const addOrdersToDB = async (odersData: TOrder) => {
+  const result = await OrderModel.create(odersData);
+  return result;
+};
+
 
 // const getSingleUserFromDB = async (id: string | number) => {
 //   const result = await UserModel.aggregate([{ $match: { id } }]);
@@ -48,5 +54,6 @@ export const UserServices = {
   getSingleUserFromDB,
   deleteUserFromDB,
   updateUserFromDB,
-  getAllOrdersFromDB
+  getAllOrdersFromDB,
+  addOrdersToDB
 };

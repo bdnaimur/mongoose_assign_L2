@@ -6,8 +6,8 @@ import { OrderModel, UserModel } from "./user.model";
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const { userData } = req.body;
-    const zodParsedData = userVAlidationWithZod.parse(userData);
+    // const { userData } = req.body;
+    const zodParsedData = userVAlidationWithZod.parse(req.body);
     // console.log("userData", userData);
 
     const result = await UserServices.createUserIntoDB(zodParsedData);
@@ -68,13 +68,6 @@ const getAllOrders = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const result = await UserServices.getAllOrdersFromDB(userId);
-
-    let totalPrice: number| undefined = 0
-    if (result !== null || result !== undefined) {
-       totalPrice = result?.orders.reduce((acc:number, product:any) => {
-        return acc + (product.price * product.quantity);
-    }, 0);
-    }
     
     if (!result) {
       res.status(404).json({
@@ -89,7 +82,6 @@ const getAllOrders = async (req: Request, res: Response) => {
       res.status(200).json({
         success: true,
         message: "Order fetched successfully!",
-        totalPrice: totalPrice,
         data: result,
       });
     }
@@ -133,16 +125,8 @@ const getSingleUser = async (req: Request, res: Response) => {
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const { userData } = req.body;
-    // console.log("userId", userId, "userData", userData);
-
-    const zodParsedData = userVAlidationWithZod.parse(userData);
-    // console.log("userId", userId);
-
+    const zodParsedData = userVAlidationWithZod.parse(req.body);
     const result = await UserServices.updateUserFromDB(userId, zodParsedData);
-
-    console.log("result", result);
-
     const obj = result?.toObject();
     if ("password" in obj) {
       delete obj.password;
@@ -208,7 +192,7 @@ const updateOrder = async (req: Request, res: Response) => {
     }
 
     // Assuming req.body contains the order data
-    const result = await OrderModel.create(req.body);
+    const result = await UserServices.addOrdersToDB(req.body)
     user.orders.push(result);
 
     // Save the updated user to the database
@@ -226,6 +210,42 @@ const updateOrder = async (req: Request, res: Response) => {
   }
 };
 
+const getUserTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const result = await UserServices.getAllOrdersFromDB(userId);
+
+    let totalPrice: number| undefined = 0
+    if (result !== null || result !== undefined) {
+       totalPrice = result?.orders.reduce((acc:number, product:any) => {
+        return acc + (product.price * product.quantity);
+    }, 0);
+    }
+    if (!result) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Total Price fetched successfully!",
+        totalPrice: totalPrice,
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "something went wrong",
+      error: err,
+    });
+  }
+};
+
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -233,5 +253,6 @@ export const UserControllers = {
   deleteUser,
   updateSingleUser,
   updateOrder,
-  getAllOrders
+  getAllOrders,
+  getUserTotalPrice
 };
