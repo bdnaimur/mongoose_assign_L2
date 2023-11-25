@@ -26,12 +26,6 @@ const addOrdersToDB = async (odersData: TOrder) => {
   return result;
 };
 
-
-// const getSingleUserFromDB = async (id: string | number) => {
-//   const result = await UserModel.aggregate([{ $match: { id } }]);
-//   return result;
-// };
-
 const getSingleUserFromDB = async (id: string | number) => {
   const result = UserModel.findOne({ userId: id });
   return result;

@@ -95,17 +95,31 @@ const getSingleUser = async (req: Request, res: Response) => {
 
     const result = await UserServices.getSingleUserFromDB(userId);
 
+    console.log("results", result);
+    
     const obj = result?.toObject();
     if (obj != undefined) {
     if ("password" in obj) {
       delete obj.password;
     }
   }
+  if (result == null) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+      error: {
+        code: 404,
+        description: "User not found!",
+      },
+    })
+  }else{
     res.status(200).json({
       success: true,
       message: "User is retrieved succesfully",
       data: obj,
     });
+  }
+    
   } catch (err: any) {
     res.status(500).json({
       success: false,
