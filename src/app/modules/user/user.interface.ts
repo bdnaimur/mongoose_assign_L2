@@ -10,7 +10,7 @@ export interface TUser {
     };
     age: number;
     email: string;
-    isActive: 'active'|'inactive';
+    isActive: boolean;
     hobbies: string[];
     address: {
       street: string;
