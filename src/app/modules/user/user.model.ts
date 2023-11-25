@@ -54,13 +54,28 @@ const userSchema = new Schema<TUser>(
 userSchema.set("versionKey", false);
 orderSchema.set("versionKey", false);
 
-userSchema.pre("save", async function (next) {
+// userSchema.pre("save", async function (next) {
+//   // eslint-disable-next-line @typescript-eslint/no-this-alias
+//   const user = this;
+//   // hashing password and save into DB
+//   user?.password = await bcrypt.hash(
+//     user?.password,
+//     Number(config.bcrypt_salt_rounds)
+//   );
+//   next();
+// });
+
+userSchema.pre('save', async function (next) {
+  // console.log(this, 'pre hook : we will save  data');
   // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
+  const user = this; // doc
   // hashing password and save into DB
+  const password: string | Buffer = user.password as string | Buffer;
+// Now you can use 'password' without TypeScript complaining
+
   user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
+    password,
+    Number(config.bcrypt_salt_rounds),
   );
   next();
 });

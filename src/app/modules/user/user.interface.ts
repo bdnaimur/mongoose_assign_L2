@@ -3,7 +3,7 @@ import { Model } from "mongoose";
 export interface TUser {
     userId: number;
     username: string;
-    password: string | number;
+    password?: string | number;
     fullName: {
       firstName: string;
       lastName: string;

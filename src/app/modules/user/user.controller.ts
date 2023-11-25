@@ -96,9 +96,11 @@ const getSingleUser = async (req: Request, res: Response) => {
     const result = await UserServices.getSingleUserFromDB(userId);
 
     const obj = result?.toObject();
+    if (obj != undefined) {
     if ("password" in obj) {
       delete obj.password;
     }
+  }
     res.status(200).json({
       success: true,
       message: "User is retrieved succesfully",
@@ -122,9 +124,12 @@ const updateSingleUser = async (req: Request, res: Response) => {
     const zodParsedData = userVAlidationWithZod.parse(req.body);
     const result = await UserServices.updateUserFromDB(userId, zodParsedData);
     const obj = result?.toObject();
-    if ("password" in obj) {
-      delete obj.password;
+    if (obj != undefined) {
+      if ("password" in obj) {
+        delete obj.password;
+      }
     }
+    
     res.status(200).json({
       success: true,
       message: "User is retrieved succesfully",
