@@ -1,18 +1,14 @@
 import { Request, Response } from "express";
 import { UserServices } from "./user.service";
 import userVAlidationWithZod from "./user.validation";
-import { OrderModel, UserModel } from "./user.model";
+import { UserModel } from "./user.model";
 // import userValidationSchema from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    // const { userData } = req.body;
     const zodParsedData = userVAlidationWithZod.parse(req.body);
-    // console.log("userData", userData);
 
     const result = await UserServices.createUserIntoDB(zodParsedData);
-
-    // console.log("result if already exists", result);
 
     const obj = result?.toObject();
     if ("password" in obj) {
@@ -26,7 +22,6 @@ const createUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      test: "test message",
       message: err.message || "something went wrong",
       error: err,
     });
@@ -97,7 +92,6 @@ const getAllOrders = async (req: Request, res: Response) => {
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    // console.log("userId", userId);
 
     const result = await UserServices.getSingleUserFromDB(userId);
 
@@ -152,8 +146,6 @@ const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    // console.log("user Id from delete", userId);
-
     await UserServices.deleteUserFromDB(userId);
 
     res.status(200).json({
@@ -190,15 +182,11 @@ const updateOrder = async (req: Request, res: Response) => {
     if (!user.orders) {
       user.orders = [];
     }
-
-    // Assuming req.body contains the order data
     const result = await UserServices.addOrdersToDB(req.body)
     user.orders.push(result);
 
     // Save the updated user to the database
     await user.save();
-
-    // Send a response with the updated user data
     res.status(200).json({
       "success": true,
       "message": "Order created successfully!",

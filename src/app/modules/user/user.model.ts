@@ -12,7 +12,12 @@ const orderSchema = new Schema<TOrder>({
 
 const userSchema = new Schema<TUser>(
   {
-    userId: { type: Number, required: true, unique: true,  message: "{VALUE} is not a unique", },
+    userId: {
+      type: Number,
+      required: true,
+      unique: true,
+      message: "{VALUE} is not a unique",
+    },
     username: { type: String || Boolean, required: true },
     password: { type: String, required: true },
     fullName: {
@@ -20,8 +25,13 @@ const userSchema = new Schema<TUser>(
       lastName: { type: String, required: true },
     },
     age: { type: Number, required: true },
-    email: { type: String, required: true, unique:true,  message: "{VALUE} is not a valid email", },
-    isActive: {type:Boolean, default: true},
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      message: "{VALUE} is not a valid email",
+    },
+    isActive: { type: Boolean, default: true },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -41,10 +51,8 @@ const userSchema = new Schema<TUser>(
   }
 );
 
-
-userSchema.set('versionKey', false);
-orderSchema.set('versionKey', false);
-
+userSchema.set("versionKey", false);
+orderSchema.set("versionKey", false);
 
 userSchema.pre("save", async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -92,11 +100,10 @@ userSchema.statics.isUserExists = async function (id: string | number) {
   return existingUser;
 };
 
-userSchema.pre('find', function (next) {
+userSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
-
 
 const UserModel = mongoose.model<TUser, TUserModel>("User", userSchema);
 const OrderModel = mongoose.model<TOrder>("Order", orderSchema);
