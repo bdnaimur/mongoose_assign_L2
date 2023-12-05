@@ -7,8 +7,10 @@ import { UserModel } from "./user.model";
 const createUser = async (req: Request, res: Response) => {
   try {
     const zodParsedData = userVAlidationWithZod.parse(req.body);
+    console.log(zodParsedData);
+    
 
-    const result = await UserServices.createUserIntoDB(zodParsedData);
+    const result = await UserServices.createUserIntoDB(req.body);
     res.status(201).json({
       success: true,
       message: "User is created succesfully",
@@ -92,12 +94,13 @@ const getSingleUser = async (req: Request, res: Response) => {
 
     console.log("results", result);
     
-    const obj = result?.toObject();
-    if (obj != undefined) {
-    if ("password" in obj) {
-      delete obj.password;
+    const newObj = {...result}
+    if (result != undefined) {
+      if ("password" in newObj) {
+        delete newObj.password;
+      }
     }
-  }
+    
   if (result == null) {
     res.status(404).json({
       success: false,
@@ -111,7 +114,7 @@ const getSingleUser = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "User is retrieved succesfully",
-      data: obj,
+      data: newObj,
     });
   }
     
@@ -145,23 +148,24 @@ const updateSingleUser = async (req: Request, res: Response) => {
       })
     }
     const zodParsedData = userUpdateVAlidationWithZod.parse(req.body);
-    // console.log("zodParsedData", zodParsedData);
+    console.log("zodParsedData", zodParsedData);
     
-    const result = await UserServices.updateUserFromDB(userIdToUpdate, zodParsedData);
+    const result = await UserServices.updateUserFromDB(userIdToUpdate, req.body);
 
     console.log("result from controller", result);
     
     const obj = result?.toObject();
+    const newObj = {...obj}
     if (obj != undefined) {
-      if ("password" in obj) {
-        delete obj.password;
+      if ("password" in newObj) {
+        delete newObj.password;
       }
     }
     
     res.status(200).json({
       success: true,
       message: "User updated succesfully",
-      data: obj,
+      data: newObj,
     });
   } catch (err: any) {
     res.status(500).json({
@@ -232,10 +236,10 @@ const getUserTotalPrice = async (req: Request, res: Response) => {
     const userId = req.params.userId;
     const result = await UserServices.getAllOrdersFromDB(userId);
 
-    let totalPrice: number| undefined = 0
+    let totalPrice: number | undefined = 0
     if (result !== null || result !== undefined) {
-       totalPrice = result?.orders.reduce((acc:number, product:any) => {
-        return acc + (product.price * product.quantity);
+       totalPrice = result?.orders?.reduce((acc:number, product:any) => {
+        return acc + (product.price * product.quantity) ;
     }, 0);
     }
     if (!result) {
