@@ -94,7 +94,7 @@ const getSingleUser = async (req: Request, res: Response) => {
 
     console.log("results", result);
     
-    const newObj = {...result}
+    const newObj = {result}
     if (result != undefined) {
       if ("password" in newObj) {
         delete newObj.password;
@@ -155,7 +155,7 @@ const updateSingleUser = async (req: Request, res: Response) => {
     console.log("result from controller", result);
     
     const obj = result?.toObject();
-    const newObj = {...obj}
+    const newObj = {obj}
     if (obj != undefined) {
       if ("password" in newObj) {
         delete newObj.password;
