@@ -5,9 +5,9 @@ import config from "../../config";
 import bcrypt from "bcrypt";
 
 const orderSchema = new Schema<TOrder>({
-  productName: { type: String, required: true },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true },
+  productName: { type: String },
+  price: { type: Number },
+  quantity: { type: Number },
 });
 
 const userSchema = new Schema<TUser>(
@@ -18,7 +18,12 @@ const userSchema = new Schema<TUser>(
       unique: true,
       message: "{VALUE} is not a unique",
     },
-    username: { type: String || Boolean, required: true },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      message: "{VALUE} is not a valid username",
+    },
     password: { type: String, required: true },
     fullName: {
       firstName: { type: String, required: true },
@@ -36,13 +41,13 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false,
     },
-    hobbies: [{ type: String }],
+    hobbies: [{ type: String, required: true }],
     address: {
       street: { type: String, required: true },
       city: { type: String, required: true },
       country: { type: String, required: true },
     },
-    orders: [orderSchema],
+    orders: [{ orderSchema }],
   },
   {
     toJSON: {
@@ -65,28 +70,35 @@ orderSchema.set("versionKey", false);
 //   next();
 // });
 
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   // console.log(this, 'pre hook : we will save  data');
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
   // hashing password and save into DB
   const password: string | Buffer = user.password as string | Buffer;
-// Now you can use 'password' without TypeScript complaining
+  // Now you can use 'password' without TypeScript complaining
 
   user.password = await bcrypt.hash(
     password,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
   next();
 });
 
 // userSchema.post("save", function (doc, next) {
-//   const obj = doc?.toObject();
-//   delete obj.password;
-//   // console.log("doc", doc);
+//   const userWithoutPassword = doc.toObject();
+//   delete userWithoutPassword.password;
+
+//   console.log("doc from models", userWithoutPassword);
 
 //   next();
 // });
+userSchema.set("toObject", {
+  transform: function (doc, ret) {
+    delete ret.password;
+    return ret;
+  },
+});
 
 // userSchema.post("findOne", function (doc, next) {
 //   // console.log("doc from findone", doc);

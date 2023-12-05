@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserServices } from "./user.service";
-import userVAlidationWithZod from "./user.validation";
+import userVAlidationWithZod, { userUpdateVAlidationWithZod } from "./user.validation";
 import { UserModel } from "./user.model";
 // import userValidationSchema from './user.validation';
 
@@ -9,15 +9,10 @@ const createUser = async (req: Request, res: Response) => {
     const zodParsedData = userVAlidationWithZod.parse(req.body);
 
     const result = await UserServices.createUserIntoDB(zodParsedData);
-
-    const obj = result?.toObject();
-    if ("password" in obj) {
-      delete obj.password;
-    }
     res.status(201).json({
       success: true,
       message: "User is created succesfully",
-      data: obj,
+      data: result,
     });
   } catch (err: any) {
     res.status(500).json({
@@ -134,9 +129,28 @@ const getSingleUser = async (req: Request, res: Response) => {
 
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
-    const zodParsedData = userVAlidationWithZod.parse(req.body);
-    const result = await UserServices.updateUserFromDB(userId, zodParsedData);
+    const { userIdToUpdate } = req.params;
+    console.log("userIdToUpdate", userIdToUpdate);
+    
+    const findUser = await UserServices.getSingleUserFromDB(userIdToUpdate);
+
+    if (!findUser?.userId) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+        error: {
+          code: 404,
+          description: "User not found!",
+        },
+      })
+    }
+    const zodParsedData = userUpdateVAlidationWithZod.parse(req.body);
+    // console.log("zodParsedData", zodParsedData);
+    
+    const result = await UserServices.updateUserFromDB(userIdToUpdate, zodParsedData);
+
+    console.log("result from controller", result);
+    
     const obj = result?.toObject();
     if (obj != undefined) {
       if ("password" in obj) {
@@ -146,17 +160,13 @@ const updateSingleUser = async (req: Request, res: Response) => {
     
     res.status(200).json({
       success: true,
-      message: "User is retrieved succesfully",
+      message: "User updated succesfully",
       data: obj,
     });
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: "User not found",
-      error: {
-        code: 404,
-        description: "User not found!",
-      },
+      message: err.message,
     });
   }
 };

@@ -5,10 +5,10 @@ const createUserIntoDB = async (userData: TUser) => {
     if (await UserModel.isUserExists(userData.userId)) {
       throw new Error('User already exists!');
     }
-  const result = await UserModel.create(userData);
-  console.log('result from service', result);
-  
-  return result;
+  const beforeResult = new UserModel(userData);
+  // console.log('result from service', result);
+    await beforeResult.save()
+  return beforeResult.toObject();
 };
 
 const getAllUsersFromDB = async () => {
@@ -36,7 +36,9 @@ const deleteUserFromDB = async (id: string | number) => {
   return result;
 };
 
-const updateUserFromDB = async (id: string | number, userData: TUser) => {
+const updateUserFromDB = async (id: string | number, userData: Partial<TUser>) => {
+  console.log("id", id);
+  
   const result = await UserModel.findOneAndUpdate({ userId: id }, userData,{ new: true },);
   console.log("result from service", result);
 

@@ -3,7 +3,7 @@ import { Model } from "mongoose";
 export interface TUser {
     userId: number;
     username: string;
-    password?: string | number;
+    password: string;
     fullName: {
       firstName: string;
       lastName: string;
@@ -17,14 +17,14 @@ export interface TUser {
       city: string;
       country: string;
     };
-    orders: TOrder[];
+    orders?: TOrder[] | undefined;
     isDeleted: boolean;
   }
   
   export interface TOrder {
-    productName: string;
-    price: number;
-    quantity: number;
+    productName?: string;
+    price?: number;
+    quantity?: number;
   }
   
 
@@ -32,6 +32,3 @@ export interface TUser {
     isUserExists(id: string|number): Promise<TUser | null>;
   }
 
-  // export interface StudentModel extends Model<TStudent> {
-  //   isUserExists(id: string): Promise<TStudent | null>;
-  // }

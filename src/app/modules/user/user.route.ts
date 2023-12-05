@@ -9,7 +9,7 @@ router.get('/users', UserControllers.getAllUsers);
 router.get('/users/:userId/orders/total-price', UserControllers.getUserTotalPrice);
 router.get('/users/:userId/orders', UserControllers.getAllOrders);
 router.put('/users/:userId/orders', UserControllers.updateOrder)
-router.put('/users/:userId', UserControllers.updateSingleUser)
+router.put('/users/:userIdToUpdate', UserControllers.updateSingleUser)
 router.get('/users/:userId', UserControllers.getSingleUser);
 
 router.delete('/users/:userId', UserControllers.deleteUser);
