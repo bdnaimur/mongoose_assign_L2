@@ -12,7 +12,7 @@ const createUserIntoDB = async (userData: TUser) => {
 };
 
 const getAllUsersFromDB = async () => {
-  const result = await UserModel.find({}, 'username fullName age email address');
+  const result = await UserModel.find({}, 'username fullName age email address').select('-_id');
   return result;
 };
 
@@ -37,10 +37,10 @@ const deleteUserFromDB = async (id: string | number) => {
 };
 
 const updateUserFromDB = async (id: string | number, userData: Partial<TUser>) => {
-  console.log("id", id);
+  // console.log("id", id);
   
   const result = await UserModel.findOneAndUpdate({ userId: id }, userData,{ new: true },);
-  console.log("result from service", result);
+  // console.log("result from service", result);
 
   return result;
 };

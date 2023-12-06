@@ -47,13 +47,14 @@ const userSchema = new Schema<TUser>(
       city: { type: String, required: true },
       country: { type: String, required: true },
     },
-    orders: [{ orderSchema }],
+    orders: [ orderSchema ],
   },
   {
     toJSON: {
       virtuals: true,
+      versionKey: false 
+       }
     },
-  }
 );
 
 userSchema.set("versionKey", false);
@@ -131,6 +132,12 @@ userSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
+
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;  
+};
 
 const UserModel = mongoose.model<TUser, TUserModel>("User", userSchema);
 const OrderModel = mongoose.model<TOrder>("Order", orderSchema);

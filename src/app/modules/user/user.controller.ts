@@ -10,7 +10,7 @@ const createUser = async (req: Request, res: Response) => {
     console.log(zodParsedData);
     
 
-    const result = await UserServices.createUserIntoDB(req.body);
+    const result = await UserServices.createUserIntoDB(zodParsedData);
     res.status(201).json({
       success: true,
       message: "User is created succesfully",
@@ -91,15 +91,6 @@ const getSingleUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     const result = await UserServices.getSingleUserFromDB(userId);
-
-    console.log("results", result);
-    
-    const newObj = {result}
-    if (result != undefined) {
-      if ("password" in newObj) {
-        delete newObj.password;
-      }
-    }
     
   if (result == null) {
     res.status(404).json({
@@ -114,7 +105,7 @@ const getSingleUser = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "User is retrieved succesfully",
-      data: newObj,
+      data: result,
     });
   }
     
@@ -133,7 +124,7 @@ const getSingleUser = async (req: Request, res: Response) => {
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
     const { userIdToUpdate } = req.params;
-    console.log("userIdToUpdate", userIdToUpdate);
+    // console.log("userIdToUpdate", userIdToUpdate);
     
     const findUser = await UserServices.getSingleUserFromDB(userIdToUpdate);
 
@@ -148,24 +139,24 @@ const updateSingleUser = async (req: Request, res: Response) => {
       })
     }
     const zodParsedData = userUpdateVAlidationWithZod.parse(req.body);
-    console.log("zodParsedData", zodParsedData);
+    // console.log("zodParsedData", zodParsedData);
     
-    const result = await UserServices.updateUserFromDB(userIdToUpdate, req.body);
+    const result = await UserServices.updateUserFromDB(userIdToUpdate, zodParsedData);
 
-    console.log("result from controller", result);
+    // console.log("result from controller", result);
     
-    const obj = result?.toObject();
-    const newObj = {obj}
-    if (obj != undefined) {
-      if ("password" in newObj) {
-        delete newObj.password;
-      }
-    }
+    // const obj = result?.toObject();
+    // const newObj = {obj}
+    // if (obj != undefined) {
+    //   if ("password" in newObj) {
+    //     delete newObj.password;
+    //   }
+    // }
     
     res.status(200).json({
       success: true,
       message: "User updated succesfully",
-      data: newObj,
+      data: result,
     });
   } catch (err: any) {
     res.status(500).json({
@@ -179,20 +170,34 @@ const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    await UserServices.deleteUserFromDB(userId);
-
+   const result =  await UserServices.deleteUserFromDB(userId);
+    // console.log("result from delete", result);
+    
+   if (!result.modifiedCount) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+      error: {
+        code: 404,
+        description: "User not found!",
+      },
+    })
+  }else{
     res.status(200).json({
       success: true,
       message: "User is deleted succesfully",
       data: null,
     });
+  }
   } catch (err: any) {
     res.status(500).json({
       success: false,
       message: err.message || "something went wrong",
       error: err,
     });
+    
   }
+  
 };
 
 const updateOrder = async (req: Request, res: Response) => {
@@ -212,11 +217,17 @@ const updateOrder = async (req: Request, res: Response) => {
     }
 
     // Check if the user has the 'orders' property, if not, create it
-    if (!user.orders) {
-      user.orders = [];
-    }
+    // if (!user.orders) {
+    //   user.orders = [];
+    // }
     const result = await UserServices.addOrdersToDB(req.body)
+    console.log("result from order", result);
+    
+    if (!user.orders) {
+      throw new Error("To add order an error occured")
+    }
     user.orders.push(result);
+    
 
     // Save the updated user to the database
     await user.save();
