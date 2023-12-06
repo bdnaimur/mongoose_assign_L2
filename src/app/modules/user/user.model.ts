@@ -49,12 +49,11 @@ const userSchema = new Schema<TUser>(
     },
     orders: [ orderSchema ],
   },
-  {
-    toJSON: {
-      virtuals: true,
-      versionKey: false 
-       }
-    },
+  // {
+  //   toJSON: {
+  //     virtuals: true
+  //      }
+  //   },
 );
 
 userSchema.set("versionKey", false);

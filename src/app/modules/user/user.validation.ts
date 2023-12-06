@@ -34,7 +34,7 @@ const userVAlidationWithZod = z.object({
   }),
   age: z.number(),
   email: z.string().email(),
-  isActive: z.boolean(),
+  isActive: z.boolean().default(true),
   hobbies: z.array(z.string()),
   address: z.object({
     street: z.string(),
@@ -42,7 +42,7 @@ const userVAlidationWithZod = z.object({
     country: z.string(),
   }),
   orders: z.array(TOrderSchema).optional(),
-  isDeleted: z.boolean(),
+  isDeleted: z.boolean().default(false)
 });
 
 
