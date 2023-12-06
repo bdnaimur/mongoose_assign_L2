@@ -29,7 +29,7 @@ const getAllUsers = async (req: Request, res: Response) => {
   try {
     const result = await UserServices.getAllUsersFromDB();
 
-    console.log("result from all users", result.length);
+    // console.log("result from all users", result.length);
 
     if (result.length == 0) {
       res.status(404).json({
