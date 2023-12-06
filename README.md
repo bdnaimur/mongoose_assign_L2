@@ -3,6 +3,33 @@
 
 Assignment Two
 
+
+To run the app to local device you have to follow the following steps:
+
+first copy the git repo and then 
+
+selcet a folder and in the folder open the terminal and write 
+git clone github link
+
+then 
+
+go to the folder and run 
+npm i
+then
+add .env file 
+and write 
+
+NODE_ENVIRONMENT=development
+PORT=5000 or what u want
+DATABASE_URL=db_link
+
+then
+
+npm run start:dev
+
+Yeah you have successfully run the local server
+
+
 Live Link:
 
 https://first-app-with-mongose-typescript.vercel.app
